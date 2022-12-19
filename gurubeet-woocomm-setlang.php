@@ -1,19 +1,23 @@
 <?php
-
 /*
- * Plugin Name:       Gurubeet Woocomm Popup Set language
- * Description:       Popup for the customer set the chosen language for the store
- * Author:            Henrique Dias
- * Version:           0.0.1
- * Requires at least: 5.8
- * Tested up to:      7.3
- * Requires PHP:      7.3
- * License:           GPL v2 or later
- * Text Domain:       gurubeet-woocomm-setlang
- * Domain Path:       /languages/
-*/
+ * Plugin Name:          Gurubeet Woocomm Popup Set language
+ * Plugin URI:           https://github.com/mrhdias/gurubeet-woocomm-setlang
+ * Description:          Popup for the customer set the chosen language for the store
+ * Author:               Henrique Dias
+ * Author URI:           https://github.com/mrhdias
+ * Version:              0.0.1
+ * Requires at least:    7.2
+ * Tested up to:         7.3
+ * Requires PHP:         7.3
+ * License:              MIT License
+ * Text Domain:          gurubeet-woocomm-setlang
+ * Domain Path:          /languages/
+ * WC requires at least: 7.1
+ * WC tested up to:      7.2
+ */
 
 // Last Modification: Mon Dec 19 05:04:24 PM WET 2022
+// zip -r gurubeet-woocomm-setlang-0.00.zip gurubeet-woocomm-setlang
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 
