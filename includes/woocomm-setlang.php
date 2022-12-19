@@ -2,7 +2,7 @@
 
 //
 // Package Gurubeet Woocomm Popup Set language
-// Last Modification: Mon Dec 19 05:12:27 PM WET 2022
+// Last Modification: Mon Dec 19 05:31:00 PM WET 2022
 //
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
@@ -149,8 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if(typeof(buttonAddExample) != 'undefined' && buttonAddExample != null) {
         buttonAddExample.onclick = function(event) {
             // console.log('click button...');
-            let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/defaults/popup-config.json', document.location.origin);
-            url.searchParams.append('lang_country_code', '2022121901');
+            let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/example/popup-config.json', document.location.origin);
+            url.searchParams.append('version', '2022121901');
             // console.log('URL: ' + url.href);
             file_get_contents(url, event.currentTarget.parentNode.children[1]);
         }
