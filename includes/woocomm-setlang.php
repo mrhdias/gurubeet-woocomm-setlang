@@ -2,7 +2,7 @@
 
 //
 // Package Gurubeet Woocomm Popup Set language
-// Last Modification: Mon Dec 19 05:31:00 PM WET 2022
+// Last Modification: Mon Dec 19 22:26:15 WET 2022
 //
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
@@ -24,7 +24,7 @@ if ( ! class_exists('Gurubeet_WooCommSetLang')) {
             } else {
 
                 $this->version_styles = '2022121902';
-                $this->version_scripts = '2022121902';
+                $this->version_scripts = '2022121909';
 
                 add_action( 'wp_enqueue_scripts', array( $this, 'wp_styles_gurubeet_woocomm_setlang' ), 9999 );
                 add_action( 'wp_enqueue_scripts', array( $this, 'wp_scripts_gurubeet_woocomm_setlang' ) );
@@ -119,12 +119,15 @@ if ( ! class_exists('Gurubeet_WooCommSetLang')) {
     white-space: nowrap;
     height: 464px;
 }
-#gurubeet_woocomm_setlang_add_example {
-    cursor: pointer;
+#gurubeet_woocomm_setlang_copy {
+    margin: 0 4px;
+}
+#gurubeet_woocomm_setlang_copy > .dashicons {
+    vertical-align: middle;
 }
 </style>
 <?php
-            echo sprintf('<textarea type="text" id="%s" name="%s" cols="50" rows="6">%s</textarea><br /><button type="button" id="gurubeet_woocomm_setlang_add_example"">Add Example</button>',
+            echo sprintf('<textarea type="text" id="%s" name="%s" cols="50" rows="6">%s</textarea><br /><button type="button" id="gurubeet_woocomm_setlang_add_example" class="button">Add Example</button><button type="button" id="gurubeet_woocomm_setlang_copy" class="button"><span class="dashicons dashicons-clipboard"></span> Copy</button>',
                 "gurubeet_woocomm_setlang_plugin_setting_json_config",
                 "gurubeet_woocomm_setlang_plugin_options[json_config]",
                 esc_attr( $options['json_config'] ) );
@@ -140,8 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 destination.value = data;
             }
         }).catch(function (err) {
-	    // There was an error
-	    console.warn('Something went wrong.', err);
+            // There was an error
+            console.warn('Something went wrong.', err);
         });
     }
 
@@ -153,6 +156,22 @@ document.addEventListener('DOMContentLoaded', () => {
             url.searchParams.append('version', '2022121901');
             // console.log('URL: ' + url.href);
             file_get_contents(url, event.currentTarget.parentNode.children[1]);
+        }
+    }
+
+    const buttonCopy = document.getElementById('gurubeet_woocomm_setlang_copy');
+    if(typeof(buttonCopy) != 'undefined' && buttonCopy != null) {
+        buttonCopy.onclick = function(event) {
+            // console.log('click button...');
+            // event.currentTarget.parentNode.children[1].value;
+            // event.currentTarget.parentNode.children[1].select();
+
+            const textarea = event.currentTarget.parentNode.children[1];
+            textarea.focus();
+            navigator.clipboard.writeText(textarea.value);
+            setTimeout(() => {
+                textarea.blur();
+            }, 1000);
         }
     }
 });
@@ -254,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // if the url of request uri is different of ip language show a popup to change the language
-            // http://www.lordelo.com/pt-pt and the country is not PT show the popup
+            // http://www.example.com/pt-pt and the country is not PT show the popup
             echo '<div id="modal-set-language" style="display:none;"></div>';
         }
     }
