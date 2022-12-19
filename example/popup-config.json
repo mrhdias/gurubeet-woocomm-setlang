@@ -1,0 +1,21 @@
+{
+    "PT": {
+        "max_hours": 48,
+        "country_codes": {
+            "lang": "pt-pt",
+            "page": "pt-pt",
+            "default": "en-us"
+        },
+        "texts": {
+            "header": "Bem-vindo",
+            "body": {
+                "information": "Parece que estás em Portugal, Gostarias de ver o nosso site em português em €EUR reais?",
+                "button": {
+                    "text": "Ir para example.com/pt-pt",
+                    "flag": "https://www.example.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/pt-pt.png"
+                }
+            },
+            "footer": "No Thanks, Stay on example.com"
+        }
+    }
+}
