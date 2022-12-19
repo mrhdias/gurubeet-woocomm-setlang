@@ -1,5 +1,5 @@
 /*
- * Last Modification: Mon Dec 19 05:25:46 PM WET 2022
+ * Last Modification: Mon Dec 19 11:30:42 PM WET 2022
  */
 
 #modal-set-language {
@@ -21,7 +21,7 @@
     background-color: #f7f7f7;
     left: calc((100% - 340px) / 2);
     top: calc(100% / 4);
-    box-shadow: #b7bbc0 1px 1px 3px 1px;
+    box-shadow: #5a5a5a 1px 1px 3px 1px;
     z-index: 1000;
 }
 
@@ -86,5 +86,6 @@
 }
 
 #modal-set-language .popup>.popup-footer {
+    cursor: pointer;
     text-align: center;
 }
