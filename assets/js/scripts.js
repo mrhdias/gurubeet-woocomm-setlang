@@ -1,6 +1,6 @@
 /* <![CDATA[ */
 /*
- * Last Modification: Mon Dec 19 05:21:59 PM WET 2022
+ * Last Modification: Mon Dec 19 22:25:50 WET 2022
  */
 
 
@@ -65,8 +65,9 @@ class PopupSetLanguage {
         let _this = this;
         iconClose.onclick = function (event) {
             console.log('close popup...');
-
+            console.log('ID Modal: ' + event.currentTarget.parentNode.parentNode.parentNode.id);
             _this.storeCustomerDate(false);
+            // test if have a class or id before close
             event.currentTarget.parentNode.parentNode.parentNode.remove();
 
         }
@@ -101,16 +102,24 @@ class PopupSetLanguage {
 
         button.appendChild(textButtonField);
 
+        // <link rel="alternate" hreflang="en" href="https://www.example.com/product/" />
+        // <link rel="alternate" hreflang="pt-pt" href="https://www.example.com/pt-pt/produto/" />
+        // <link rel="alternate" hreflang="es" href="https://www.example.com/es/producto/" />
+        // <link rel="alternate" hreflang="x-default" href="https://www.example.com/product/" />
+
         let _this = this;
         button.onclick = function (event) {
             console.log('clicked in popup button...');
 
-            const langLink = document.body.querySelector('li > a[hreflang="' + _this.geoIpData['country_codes']['page'] + '"]');
+            const langLink = document.head.querySelector('link[hreflang="' + _this.geoIpData['country_codes']['page'] + '"]');
+            // console.log('Lang Link Href: ' + langLink.href);
+            // const langLink = document.body.querySelector('li > a[hreflang="' + _this.geoIpData['country_codes']['page'] + '"]');
             if (typeof (langLink) != 'undefined' && langLink != null) {
                 _this.storeCustomerDate(true);
-                langLink.click();
+                // langLink.click();
+                window.location.href = langLink.href;
             }
-
+            // console.log('ID Modal: ' + event.currentTarget.parentNode.parentNode.parentNode.id);
             event.currentTarget.parentNode.parentNode.parentNode.remove();
         }
 
@@ -240,7 +249,7 @@ class PopupSetLanguage {
         console.log('Location: ' + document.location);
 
         let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/geoip.php', document.location.origin);
-        url.searchParams.append('version', '2022121901');
+        url.searchParams.append('version', '2022121801');
         url.searchParams.append('lang_country_code', lang_country_code.toLowerCase());
         console.log('URL: ' + url.href);
 
@@ -259,6 +268,7 @@ class PopupSetLanguage {
                     }
                     _this.geoIpData = results;
                     _this.buildPopup(results);
+                    // comment for debug
                     _this.modalElement.style.display = "block";
                 } else {
                     _this.setCustomerLang();
@@ -280,5 +290,6 @@ function main() {
 window.onload = function () {
     main();
 };
+
 
 /* ]]> */
