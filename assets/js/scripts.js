@@ -1,6 +1,6 @@
 /* <![CDATA[ */
 /*
- * Last Modification: Mon Dec 19 22:25:50 WET 2022
+ * Last Modification: Tue Dec 20 11:47:29 WET 2022
  */
 
 
@@ -44,7 +44,7 @@ class PopupSetLanguage {
                 'page': this.geoIpData['country_codes']['page']
             }
         }
-        localStorage.setItem('customer-set-lang-storage', JSON.stringify(data));
+        this.updateLocalStorage('customer-set-lang-storage', data);
     }
 
     addHeaderContent(headerText) {
@@ -197,13 +197,13 @@ class PopupSetLanguage {
             return true;
         }
 
-        const customerSetLan = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
-        if (('ip' in customerSetLan) && (customerSetLan['ip'] !== results['ip'])) {
+        const customerSetLang = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
+        if (('ip' in customerSetLang) && (customerSetLang['ip'] !== results['ip'])) {
             return true;
         }
 
-        if (('date' in customerSetLan) && (customerSetLan['date'] !== '')) {
-            const date = new Date(customerSetLan['date']);
+        if (('date' in customerSetLang) && (customerSetLang['date'] !== '')) {
+            const date = new Date(customerSetLang['date']);
             const nowDate = new Date();
             console.log('Customer Stored Date: ' + date);
             const difference = nowDate.getTime() - date.getTime();
@@ -228,17 +228,48 @@ class PopupSetLanguage {
             return;
         }
 
-        const customerSetLan = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
+        const customerSetLang = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
 
-        if (customerSetLan['change'] && document.documentElement.lang.toLowerCase() !== customerSetLan['country_codes']['lang']) {
-            // console.log('Lang: ' + document.documentElement.lang + ' Page: ' + customerSetLan['country_codes']['page']);
-            const langLink = document.body.querySelector('li > a[hreflang="' + customerSetLan['country_codes']['page'] + '"]');
+        if (customerSetLang['change'] && document.documentElement.lang.toLowerCase() !== customerSetLang['country_codes']['lang']) {
+            // console.log('Lang: ' + document.documentElement.lang + ' Page: ' + customerSetLang['country_codes']['page']);
+            const langLink = document.body.querySelector('li > a[hreflang="' + customerSetLang['country_codes']['page'] + '"]');
             if (typeof (langLink) != 'undefined' && langLink != null) {
                 langLink.click();
             }
         }
 
         return;
+    }
+
+    updateLocalStorage(key, data) {
+        if (localStorage.getItem(key)) {
+            localStorage.removeItem(key);
+        }
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    manageStatus() {
+        console.log('manage status');
+
+        if (!localStorage.getItem('customer-set-lang-storage')) {
+            return;
+        }
+
+        let _this = this;
+        document.body.querySelectorAll('ul.sub-menu > li.menu-item > a:has(> img)').forEach(function (linkLang, index) {
+            // console.log('Link Lang: ' + linkLang.href);
+
+            linkLang.onclick = function (event) {
+                // event.preventDefault();
+                // console.log('click link: ' + event.currentTarget.href);
+
+                const customerSetLang = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
+                if (('change' in customerSetLang) && customerSetLang['change']) {
+                    customerSetLang['change'] = false;
+                    _this.updateLocalStorage('customer-set-lang-storage', customerSetLang);
+                }
+            }
+        });
     }
 
     init() {
@@ -275,7 +306,10 @@ class PopupSetLanguage {
                 }
             }
         });
+
+        this.manageStatus();
     }
+
 }
 
 
@@ -290,6 +324,5 @@ function main() {
 window.onload = function () {
     main();
 };
-
 
 /* ]]> */
