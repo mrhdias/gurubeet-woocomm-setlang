@@ -1,12 +1,14 @@
+
 /* <![CDATA[ */
 /*
- * Last Modification: Tue Dec 20 11:47:29 WET 2022
+ * Last Modification: Tue Dec 20 17:16:55 WET 2022
  */
 
 
 class PopupSetLanguage {
     modalElement = null;
-    geoIpData = {}
+    geoIpData = {};
+    localStorageKey = '';
 
     constructor(destination) {
         console.log('PopupSetLanguage');
@@ -16,6 +18,7 @@ class PopupSetLanguage {
             throw new Error("Abort Script: no modal destination id");
         }
 
+        this.localStorageKey = 'customer-set-lang-storage';
     }
 
     // setNewUrl() {
@@ -44,7 +47,13 @@ class PopupSetLanguage {
                 'page': this.geoIpData['country_codes']['page']
             }
         }
-        this.updateLocalStorage('customer-set-lang-storage', data);
+        this.updateLocalStorage(data);
+    }
+
+    removeModal() {
+        console.log('close modal...');
+        this.storeCustomerDate(false);
+        this.modalElement.remove();
     }
 
     addHeaderContent(headerText) {
@@ -65,11 +74,11 @@ class PopupSetLanguage {
         let _this = this;
         iconClose.onclick = function (event) {
             console.log('close popup...');
-            console.log('ID Modal: ' + event.currentTarget.parentNode.parentNode.parentNode.id);
-            _this.storeCustomerDate(false);
+            // console.log('ID Modal: ' + event.currentTarget.parentNode.parentNode.parentNode.id);
+            // _this.storeCustomerDate(false);
             // test if have a class or id before close
-            event.currentTarget.parentNode.parentNode.parentNode.remove();
-
+            // event.currentTarget.parentNode.parentNode.parentNode.remove();
+            _this.removeModal();
         }
 
         return header;
@@ -120,7 +129,8 @@ class PopupSetLanguage {
                 window.location.href = langLink.href;
             }
             // console.log('ID Modal: ' + event.currentTarget.parentNode.parentNode.parentNode.id);
-            event.currentTarget.parentNode.parentNode.parentNode.remove();
+            // event.currentTarget.parentNode.parentNode.parentNode.remove();
+            _this.modalElement.remove();
         }
 
         body.appendChild(button);
@@ -134,6 +144,12 @@ class PopupSetLanguage {
 
         const text = document.createTextNode(footerText);
         footer.appendChild(text);
+
+        let _this = this;
+        footer.onclick = function (event) {
+            console.log('clicked in footer');
+            _this.removeModal();
+        }
 
         return footer;
     }
@@ -160,8 +176,9 @@ class PopupSetLanguage {
             const isClickInside = popup.contains(event.target)
             if (!isClickInside) {
                 console.log('click modal...');
-                _this.storeCustomerDate(false);
-                event.currentTarget.remove();
+                _this.removeModal();
+                // _this.storeCustomerDate(false);
+                // event.currentTarget.remove();
             }
         }
 
@@ -193,11 +210,11 @@ class PopupSetLanguage {
     }
 
     checkIfIsToShow(results) {
-        if (!localStorage.getItem('customer-set-lang-storage')) {
+        if (localStorage.getItem(this.localStorageKey) === null) {
             return true;
         }
 
-        const customerSetLang = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
+        const customerSetLang = JSON.parse(localStorage.getItem(this.localStorageKey));
         if (('ip' in customerSetLang) && (customerSetLang['ip'] !== results['ip'])) {
             return true;
         }
@@ -224,11 +241,11 @@ class PopupSetLanguage {
             return;
         }
 
-        if (localStorage.getItem('customer-set-lang-storage') === null) {
+        if (localStorage.getItem(this.localStorageKey) === null) {
             return;
         }
 
-        const customerSetLang = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
+        const customerSetLang = JSON.parse(localStorage.getItem(this.localStorageKey));
 
         if (customerSetLang['change'] && document.documentElement.lang.toLowerCase() !== customerSetLang['country_codes']['lang']) {
             // console.log('Lang: ' + document.documentElement.lang + ' Page: ' + customerSetLang['country_codes']['page']);
@@ -241,17 +258,18 @@ class PopupSetLanguage {
         return;
     }
 
-    updateLocalStorage(key, data) {
-        if (localStorage.getItem(key)) {
-            localStorage.removeItem(key);
+    updateLocalStorage(data) {
+        if (localStorage.getItem(this.localStorageKey) !== null) {
+            localStorage.removeItem(this.localStorageKey);
         }
-        localStorage.setItem(key, JSON.stringify(data));
+        localStorage.setItem(this.localStorageKey, JSON.stringify(data));
     }
 
     manageStatus() {
         console.log('manage status');
 
-        if (!localStorage.getItem('customer-set-lang-storage')) {
+        if (localStorage.getItem(this.localStorageKey) === null) {
+            // when reload the page the local storage item already has been set
             return;
         }
 
@@ -263,10 +281,10 @@ class PopupSetLanguage {
                 // event.preventDefault();
                 // console.log('click link: ' + event.currentTarget.href);
 
-                const customerSetLang = JSON.parse(localStorage.getItem('customer-set-lang-storage'));
+                const customerSetLang = JSON.parse(localStorage.getItem(_this.localStorageKey));
                 if (('change' in customerSetLang) && customerSetLang['change']) {
                     customerSetLang['change'] = false;
-                    _this.updateLocalStorage('customer-set-lang-storage', customerSetLang);
+                    _this.updateLocalStorage(customerSetLang);
                 }
             }
         });
@@ -274,6 +292,7 @@ class PopupSetLanguage {
 
     init() {
         console.log('init');
+        // console.log('Test Local Storage: ' + localStorage.getItem('test-test'));
 
         const lang_country_code = (typeof (document.documentElement.lang) === 'undefined' || document.documentElement.lang === null) ? '' : document.documentElement.lang;
         console.log('Lang: ' + lang_country_code);
@@ -294,8 +313,8 @@ class PopupSetLanguage {
             } else {
                 console.log('Check if is to show the popup...');
                 if (_this.checkIfIsToShow(results)) {
-                    if (localStorage.getItem('customer-set-lang-storage')) {
-                        localStorage.removeItem('customer-set-lang-storage');
+                    if (localStorage.getItem(_this.localStorageKey) !== null) {
+                        localStorage.removeItem(_this.localStorageKey);
                     }
                     _this.geoIpData = results;
                     _this.buildPopup(results);
