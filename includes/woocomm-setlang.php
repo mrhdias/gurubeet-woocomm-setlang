@@ -2,7 +2,7 @@
 
 //
 // Package Gurubeet Woocomm Popup Set language
-// Last Modification: Wed Dec 21 12:15:30 WET 2022
+// Last Modification: Wed Dec 21 10:19:53 PM WET 2022
 //
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
@@ -53,9 +53,11 @@ if ( ! class_exists('Gurubeet_WooCommSetLang')) {
 
         public function register_woocommerce_submenu() {
             // https://techglimpse.com/add-submenu-woocommerce-wp-plugin/
+            // https://developer.wordpress.org/reference/functions/add_menu_page/
             // https://developer.wordpress.org/reference/functions/add_submenu_page/
 
             $parent_slug = 'woocommerce';
+
             $this->options_page_hook = add_submenu_page(
                 $parent_slug,
                 esc_html__('Customer Set Language Popup', 'gurubeet-woocomm-setlang'),
@@ -110,75 +112,8 @@ if ( ! class_exists('Gurubeet_WooCommSetLang')) {
                 $options['json_config'] = '{}';
             }
             // $this->json_config = $options['json_config'];
-?>
-<style>
-#gurubeet_woocomm_setlang_plugin_setting_json_config {
-    width: 100%;
-    font-size: initial;
-    font-family: monospace;
-    white-space: nowrap;
-    height: 464px;
-}
-#gurubeet_woocomm_setlang_copy {
-    margin: 0 4px;
-}
-#gurubeet_woocomm_setlang_copy > .dashicons {
-    vertical-align: middle;
-}
-</style>
-<?php
-            echo sprintf('<textarea type="text" id="%s" name="%s" cols="50" rows="6">%s</textarea><br /><button type="button" id="gurubeet_woocomm_setlang_add_example" class="button">Add Example</button><button type="button" id="gurubeet_woocomm_setlang_copy" class="button"><span class="dashicons dashicons-clipboard"></span> Copy</button>',
-                "gurubeet_woocomm_setlang_plugin_setting_json_config",
-                "gurubeet_woocomm_setlang_plugin_options[json_config]",
-                esc_attr( $options['json_config'] ) );
-?>
-<script>
-/* <![CDATA[ */
-document.addEventListener('DOMContentLoaded', () => {
 
-    function file_get_contents(filename, destination) {
-        fetch(filename).then((resp) => resp.text()).then(data => {
-            // console.log('Data: ' + data);
-            if (data.length > 0 && typeof(destination) != 'undefined' && destination != null) {
-                destination.value = data;
-            }
-        }).catch(function (err) {
-            // There was an error
-            console.warn('Something went wrong.', err);
-        });
-    }
-
-    const buttonAddExample = document.getElementById('gurubeet_woocomm_setlang_add_example');
-    if(typeof(buttonAddExample) != 'undefined' && buttonAddExample != null) {
-        buttonAddExample.onclick = function(event) {
-            // console.log('click button...');
-            let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/example/popup-config.json', document.location.origin);
-            url.searchParams.append('version', '2022121901');
-            // console.log('URL: ' + url.href);
-            file_get_contents(url, event.currentTarget.parentNode.children[1]);
-        }
-    }
-
-    const buttonCopy = document.getElementById('gurubeet_woocomm_setlang_copy');
-    if(typeof(buttonCopy) != 'undefined' && buttonCopy != null) {
-        buttonCopy.onclick = function(event) {
-            // console.log('click button...');
-            // event.currentTarget.parentNode.children[1].value;
-            // event.currentTarget.parentNode.children[1].select();
-
-            const textarea = event.currentTarget.parentNode.children[1];
-            textarea.focus();
-            navigator.clipboard.writeText(textarea.value);
-            setTimeout(() => {
-                textarea.blur();
-            }, 1000);
-        }
-    }
-});
-/* ]]> */
-</script>
-<?php
-
+            include( 'section-textarea.php' );
         }
 
         public function woocomm_setlang_plugin_setting_status() {
@@ -215,7 +150,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if ( !$this->json_validator($input['json_config']) ) {
-                add_settings_error( 'json_config', esc_attr( 'json_configuration_updated' ), __('Invalid JSON string', 'gurubeet-woocomm-setlang'), 'error' );
+                add_settings_error(
+                    'json_config',
+                    esc_attr( 'json_configuration_updated' ),
+                    __('Invalid JSON string', 'gurubeet-woocomm-setlang'),
+                   'error'
+                );
                 $input['status'] = 0; // disable the popup
             }
 
@@ -235,34 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         public function gurubeet_woocomm_setlang_settings_page_callback() {
             // https://deliciousbrains.com/create-wordpress-plugin-settings-page/
             // require('settings.php');
-
-?>
-<style>
-.gurubeet_woocomm_setlang_title {
-    border-bottom: 1px solid #aaa;
-    padding-bottom: 10px;
-    margin-right: 10px;
-}
-.gurubeet_woocomm_setlang_form > table {
-    width: calc(100% - 10px);
-    border-top: 1px solid #aaa;
-    border-bottom: 1px solid #aaa;
-    margin-bottom: 10px;
-}
-.gurubeet_woocomm_setlang_form > table > tbody {
-    border-bottom: 1px solid #aaa;
-}
-</style>
-<h2 class="gurubeet_woocomm_setlang_title">Gurubeet Woocomm Set Language Popup Plugin Settings</h2>
-<?php settings_errors(); ?>
-<form class="gurubeet_woocomm_setlang_form" action="options.php" method="post">
-    <?php
-    settings_fields( 'gurubeet_woocomm_setlang_plugin_options' );
-    do_settings_sections( 'gurubeet_woocomm_setlang_plugin' );
-    ?>
-    <input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
-</form>
-<?php
+            include( 'page-settings.php' );
         }
 
         public function popup_set_language() {
