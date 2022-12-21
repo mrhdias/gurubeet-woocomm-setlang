@@ -2,7 +2,7 @@
 
 //
 // Package Gurubeet Woocomm Popup Set language
-// Last Modification: Tue Dec 20 17:17:37 WET 2022
+// Last Modification: Wed Dec 21 12:15:30 WET 2022
 //
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
@@ -24,7 +24,7 @@ if ( ! class_exists('Gurubeet_WooCommSetLang')) {
             } else {
 
                 $this->version_styles = '2022122001';
-                $this->version_scripts = '2022122001';
+                $this->version_scripts = '2022122110';
 
                 add_action( 'wp_enqueue_scripts', array( $this, 'wp_styles_gurubeet_woocomm_setlang' ), 9999 );
                 add_action( 'wp_enqueue_scripts', array( $this, 'wp_scripts_gurubeet_woocomm_setlang' ) );
