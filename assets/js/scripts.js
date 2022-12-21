@@ -1,7 +1,7 @@
 
 /* <![CDATA[ */
 /*
- * Last Modification: Tue Dec 20 17:16:55 WET 2022
+ * Last Modification: Wed Dec 21 11:43:52 WET 2022
  */
 
 
@@ -9,15 +9,17 @@ class PopupSetLanguage {
     modalElement = null;
     geoIpData = {};
     localStorageKey = '';
+    debug = false;
 
-    constructor(destination) {
-        console.log('PopupSetLanguage');
+    constructor(destination, debug = false) {
+        // console.log('PopupSetLanguage');
 
         this.modalElement = document.getElementById(destination);
         if (typeof (this.modalElement) === 'undefined' || this.modalElement === null) {
             throw new Error("Abort Script: no modal destination id");
         }
 
+        this.debug = debug;
         this.localStorageKey = 'customer-set-lang-storage';
     }
 
@@ -36,7 +38,7 @@ class PopupSetLanguage {
 
     storeCustomerDate(change) {
         const nowDate = new Date().toJSON();
-        console.log('Now Date: ' + nowDate);
+        // console.log('Now Date: ' + nowDate);
         const data = {
             'change': change,
             'date': nowDate,
@@ -51,7 +53,7 @@ class PopupSetLanguage {
     }
 
     removeModal() {
-        console.log('close modal...');
+        // console.log('close modal...');
         this.storeCustomerDate(false);
         this.modalElement.remove();
     }
@@ -73,7 +75,7 @@ class PopupSetLanguage {
 
         let _this = this;
         iconClose.onclick = function (event) {
-            console.log('close popup...');
+            // console.log('close popup...');
             // console.log('ID Modal: ' + event.currentTarget.parentNode.parentNode.parentNode.id);
             // _this.storeCustomerDate(false);
             // test if have a class or id before close
@@ -118,7 +120,7 @@ class PopupSetLanguage {
 
         let _this = this;
         button.onclick = function (event) {
-            console.log('clicked in popup button...');
+            // console.log('clicked in popup button...');
 
             const langLink = document.head.querySelector('link[hreflang="' + _this.geoIpData['country_codes']['page'] + '"]');
             // console.log('Lang Link Href: ' + langLink.href);
@@ -147,7 +149,7 @@ class PopupSetLanguage {
 
         let _this = this;
         footer.onclick = function (event) {
-            console.log('clicked in footer');
+            // console.log('clicked in footer');
             _this.removeModal();
         }
 
@@ -175,7 +177,7 @@ class PopupSetLanguage {
         this.modalElement.onclick = function (event) {
             const isClickInside = popup.contains(event.target)
             if (!isClickInside) {
-                console.log('click modal...');
+                // console.log('click modal...');
                 _this.removeModal();
                 // _this.storeCustomerDate(false);
                 // event.currentTarget.remove();
@@ -192,6 +194,8 @@ class PopupSetLanguage {
 
     getDataFromGeoIP(url) {
 
+        document.body.style.cursor = 'wait';
+
         const promise = new Promise(function (resolve, reject) {
 
             const xhr = new XMLHttpRequest();
@@ -202,6 +206,7 @@ class PopupSetLanguage {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     resolve(JSON.parse(xhr.responseText));
                 }
+                document.body.style.cursor = 'default';
             };
             xhr.send();
         });
@@ -222,12 +227,13 @@ class PopupSetLanguage {
         if (('date' in customerSetLang) && (customerSetLang['date'] !== '')) {
             const date = new Date(customerSetLang['date']);
             const nowDate = new Date();
-            console.log('Customer Stored Date: ' + date);
+            // console.log('Customer Stored Date: ' + date);
             const difference = nowDate.getTime() - date.getTime();
 
             const hours = Math.ceil(difference / (1000 * 3600));
-            console.log('Number of hours that passed since last chosen: ' + hours);
-
+            if (this.debug) {
+                console.log('Number of hours that passed since last chosen: ' + hours);
+            }
             return (hours > parseInt(results['max_hours']));
         }
 
@@ -235,7 +241,7 @@ class PopupSetLanguage {
     }
 
     setCustomerLang() {
-        console.log('set customer language...');
+        // console.log('set customer language...');
 
         if (typeof (document.documentElement.lang) === 'undefined' || document.documentElement.lang === null) {
             return;
@@ -266,7 +272,7 @@ class PopupSetLanguage {
     }
 
     manageStatus() {
-        console.log('manage status');
+        // console.log('manage status');
 
         if (localStorage.getItem(this.localStorageKey) === null) {
             // when reload the page the local storage item already has been set
@@ -291,27 +297,29 @@ class PopupSetLanguage {
     }
 
     init() {
-        console.log('init');
+        // console.log('init');
         // console.log('Test Local Storage: ' + localStorage.getItem('test-test'));
 
         const lang_country_code = (typeof (document.documentElement.lang) === 'undefined' || document.documentElement.lang === null) ? '' : document.documentElement.lang;
-        console.log('Lang: ' + lang_country_code);
-        console.log('Location: ' + document.location);
+        // console.log('Lang: ' + lang_country_code);
+        // console.log('Location: ' + document.location);
 
         let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/geoip.php', document.location.origin);
         url.searchParams.append('version', '2022121801');
         url.searchParams.append('lang_country_code', lang_country_code.toLowerCase());
-        console.log('URL: ' + url.href);
+        // console.log('URL: ' + url.href);
 
         let _this = this;
         this.getDataFromGeoIP(url).then(function (results) {
-            console.log('Result: ' + JSON.stringify(results));
+            if (_this.debug) {
+                console.log('Result: ' + JSON.stringify(results));
+            }
             if ("error" in results) {
                 console.log('Error: ' + results["error"]);
             } else if (("skip" in results) && results["skip"]) {
                 console.log('Skip popup...');
             } else {
-                console.log('Check if is to show the popup...');
+                // console.log('Check if is to show the popup...');
                 if (_this.checkIfIsToShow(results)) {
                     if (localStorage.getItem(_this.localStorageKey) !== null) {
                         localStorage.removeItem(_this.localStorageKey);
@@ -333,7 +341,7 @@ class PopupSetLanguage {
 
 
 function main() {
-    console.log('URL: ' + window.location.pathname);
+    // console.log('URL: ' + window.location.pathname);
 
     let popSetLanguage = new PopupSetLanguage('modal-set-language');
     popSetLanguage.init();
