@@ -16,7 +16,7 @@
  * WC tested up to:      7.2
  */
 
-// Last Modification: Mon Dec 19 05:04:24 PM WET 2022
+// Last Modification: Thu Dec 22 21:59:27 WET 2022
 // zip -r gurubeet-woocomm-setlang-0.00.zip gurubeet-woocomm-setlang
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
