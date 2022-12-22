@@ -6,8 +6,8 @@
  * Author:               Henrique Dias
  * Author URI:           https://github.com/mrhdias
  * Version:              0.0.1
- * Requires at least:    7.2
- * Tested up to:         7.3
+ * Requires at least:    6.0
+ * Tested up to:         6.1.1
  * Requires PHP:         7.3
  * License:              MIT License
  * Text Domain:          gurubeet-woocomm-setlang
