@@ -7,10 +7,9 @@
     white-space: nowrap;
     height: 464px;
 }
-#gurubeet_woocomm_setlang_copy {
-    margin: 0 4px;
-}
-#gurubeet_woocomm_setlang_copy > .dashicons {
+
+#gurubeet_woocomm_setlang_form
+.button > .dashicons {
     vertical-align: middle;
 }
 </style>
@@ -19,8 +18,13 @@
     echo esc_attr( $options['json_config'] );
 ?>
 </textarea><br />
-<button type="button" id="gurubeet_woocomm_setlang_add_example" class="button">Add Example</button>
-<button type="button" id="gurubeet_woocomm_setlang_copy" class="button"><span class="dashicons dashicons-clipboard"></span> Copy</button>
+<div class="gurubeet_woocomm_setlang_edition">
+    <button type="button" id="gurubeet_woocomm_setlang_add_example" class="button"><span class="dashicons dashicons-plus"></span> Add Example</button>
+<?php if($cached_json_file !== '' && file_exists($cached_json_file)) { ?>
+    <button type="button" id="gurubeet_woocomm_setlang_recover" class="button"><span class="dashicons dashicons-undo"></span> Recover</button>
+<?php } ?>
+    <button type="button" id="gurubeet_woocomm_setlang_copy" class="button"><span class="dashicons dashicons-clipboard"></span> Copy</button>
+</div>
 <script>
 /* <![CDATA[ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,11 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
         buttonAddExample.onclick = function(event) {
             // console.log('click button...');
             let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/example/popup-config.json', document.location.origin);
-            url.searchParams.append('version', '2022122101');
+            url.searchParams.append('version', '2022122201');
             // console.log('URL: ' + url.href);
-            file_get_contents(url, event.currentTarget.parentNode.children[1]);
+            file_get_contents(url, event.currentTarget.parentNode.parentNode.children[1]);
         }
     }
+
+    const buttonRecover = document.getElementById('gurubeet_woocomm_setlang_recover');
+    if(typeof(buttonRecover) != 'undefined' && buttonRecover != null) {
+        buttonRecover.onclick = function(event) {
+            // console.log('click button...');
+            let url = new URL('wp-content/cache/gurubeet-woocomm-setlang/popup-config.json', document.location.origin);
+            url.searchParams.append('version', '2022122201');
+            // console.log('URL: ' + url.href);
+            file_get_contents(url, event.currentTarget.parentNode.parentNode.children[1]);
+        }
+    }
+
 
     const buttonCopy = document.getElementById('gurubeet_woocomm_setlang_copy');
     if(typeof(buttonCopy) != 'undefined' && buttonCopy != null) {
@@ -55,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // event.currentTarget.parentNode.children[1].value;
             // event.currentTarget.parentNode.children[1].select();
 
-            const textarea = event.currentTarget.parentNode.children[1];
+            const textarea = event.currentTarget.parentNode.parentNode.children[1];
             textarea.focus();
             navigator.clipboard.writeText(textarea.value);
             setTimeout(() => {
