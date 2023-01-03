@@ -16,19 +16,12 @@
  * WC tested up to:      7.2
  */
 
-// Last Modification: Thu Dec 22 21:59:27 WET 2022
+// Last Modification: Tue Jan 03 04:58:44 PM WET 2023
 // zip -r gurubeet-woocomm-setlang-0.00.zip gurubeet-woocomm-setlang
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly
 
 /* Init Hook */
-
-include_once ABSPATH . 'wp-admin/includes/plugin.php';
-foreach (array('woocommerce/woocommerce.php', 'woocommerce-multilingual/wpml-woocommerce.php') as $plugin) {
-    if ( !is_plugin_active( $plugin ) ) {
-        exit;
-    }
-}
 
 function gurubeet_woocomm_setlang_load_textdomain() {
     load_plugin_textdomain( 'gurubeet-woocomm-setlang', false, basename( dirname( __FILE__ ) ) . '/languages' );
@@ -36,5 +29,23 @@ function gurubeet_woocomm_setlang_load_textdomain() {
 add_action( 'init', 'gurubeet_woocomm_setlang_load_textdomain' );
 
 require_once(sprintf("%s/%s", plugin_dir_path( __FILE__ ), 'includes/woocomm-setlang.php'));
+
+function gurubeet_woocomm_setlang_plugin_activate() {
+    require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+    $plugins = array(
+        'woocommerce/woocommerce.php' => 'Woocommerce',
+        'woocommerce-multilingual/wpml-woocommerce.php' => 'Woocommerce-Multilingual',
+    );
+
+    foreach ($plugins as $plugin => $name) {
+        if ( !is_plugin_active( $plugin ) ) {
+            echo __(sprintf('<div>The dependency <strong>"%s"</strong> is not installed</div>', $name), 'gurubeet-woocomm-setlang');
+            //Adding @ before will prevent XDebug output
+            @trigger_error(__('Please update all dependencies before activating.', 'gurubeet-woocomm-setlang'), E_USER_ERROR);
+        }
+    }
+}
+register_activation_hook( __FILE__, 'gurubeet_woocomm_setlang_plugin_activate' );
 
 ?>
