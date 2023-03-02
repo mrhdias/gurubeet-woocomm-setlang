@@ -1,7 +1,7 @@
 
 /* <![CDATA[ */
 /*
- * Last Modification: Wed Dec 21 11:43:52 WET 2022
+ * Last Modification: Thu Mar 02 18:20:06 WET 2023
  */
 
 
@@ -348,8 +348,12 @@ function main() {
 
 }
 
-window.onload = function () {
+// window.onload = function () {
+//     main();
+// };
+
+document.addEventListener("DOMContentLoaded", function(event) {
     main();
-};
+});
 
 /* ]]> */
