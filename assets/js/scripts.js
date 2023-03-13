@@ -1,7 +1,7 @@
 
 /* <![CDATA[ */
 /*
- * Last Modification: Thu Mar 02 18:20:06 WET 2023
+ * Last Modification: 2023-03-13 10:12:31
  */
 
 
@@ -339,21 +339,10 @@ class PopupSetLanguage {
 
 }
 
-
-function main() {
+document.addEventListener("DOMContentLoaded", function(event) {
     // console.log('URL: ' + window.location.pathname);
-
     let popSetLanguage = new PopupSetLanguage('modal-set-language');
     popSetLanguage.init();
-
-}
-
-// window.onload = function () {
-//     main();
-// };
-
-document.addEventListener("DOMContentLoaded", function(event) {
-    main();
 });
 
 /* ]]> */
