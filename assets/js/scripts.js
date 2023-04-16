@@ -1,7 +1,7 @@
 
 /* <![CDATA[ */
 /*
- * Last Modification: 2023-04-16 21:05:59
+ * Last Modification: 2023-04-16 23:49:12
  */
 
 
@@ -275,7 +275,7 @@ class PopupSetLanguage {
         }
 
         let _this = this;
-        document.body.querySelectorAll('ul.sub-menu > li.menu-item > a:has(> img)').forEach(function (linkLang, index) {
+        document.body.querySelectorAll('ul.sub-menu > li.menu-item > a:has(img)').forEach(function (linkLang, index) {
             // console.log('Link Lang: ' + linkLang.href);
 
             linkLang.onclick = function (event) {
