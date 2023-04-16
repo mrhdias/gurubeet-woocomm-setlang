@@ -1,7 +1,7 @@
 
 /* <![CDATA[ */
 /*
- * Last Modification: 2023-03-13 10:12:31
+ * Last Modification: 2023-04-16 21:05:59
  */
 
 
@@ -20,7 +20,9 @@ class PopupSetLanguage {
         }
 
         this.debug = debug;
-        this.localStorageKey = 'customer-set-lang-storage';
+
+        const utf8ToB64 = btoa(encodeURIComponent(window.location.hostname));
+        this.localStorageKey = 'customer-set-lang-storage'.concat('-', utf8ToB64.replace('==', ''));
     }
 
     // setNewUrl() {
@@ -42,6 +44,7 @@ class PopupSetLanguage {
         const data = {
             'change': change,
             'date': nowDate,
+            'max_hours': this.geoIpData['max_hours'],
             'ip': this.geoIpData['ip'],
             'country_codes': {
                 'ip': this.geoIpData['country_codes']['ip'],
@@ -214,17 +217,13 @@ class PopupSetLanguage {
         return promise;
     }
 
-    checkIfIsToShow(results) {
-        if (localStorage.getItem(this.localStorageKey) === null) {
-            return true;
-        }
+    checkIfIsToShow(customerSetLang) {
 
-        const customerSetLang = JSON.parse(localStorage.getItem(this.localStorageKey));
-        if (('ip' in customerSetLang) && (customerSetLang['ip'] !== results['ip'])) {
-            return true;
-        }
+        if (('date' in customerSetLang) && (customerSetLang['date'] !== '') &&
+            ('max_hours' in customerSetLang) && (customerSetLang['max_hours'] > 0)) {
 
-        if (('date' in customerSetLang) && (customerSetLang['date'] !== '')) {
+            // console.log('Customer Stored Max Hours: ' + customerSetLang['max_hours']);
+
             const date = new Date(customerSetLang['date']);
             const nowDate = new Date();
             // console.log('Customer Stored Date: ' + date);
@@ -234,26 +233,22 @@ class PopupSetLanguage {
             if (this.debug) {
                 console.log('Number of hours that passed since last chosen: ' + hours);
             }
-            return (hours > parseInt(results['max_hours']));
+
+            return (hours > customerSetLang['max_hours']);
         }
 
         return true;
     }
 
-    setCustomerLang() {
+    setCustomerLang(customerSetLang) {
         // console.log('set customer language...');
 
         if (typeof (document.documentElement.lang) === 'undefined' || document.documentElement.lang === null) {
             return;
         }
 
-        if (localStorage.getItem(this.localStorageKey) === null) {
-            return;
-        }
-
-        const customerSetLang = JSON.parse(localStorage.getItem(this.localStorageKey));
-
-        if (customerSetLang['change'] && document.documentElement.lang.toLowerCase() !== customerSetLang['country_codes']['lang']) {
+        if (customerSetLang['change'] &&
+            document.documentElement.lang.toLowerCase() !== customerSetLang['country_codes']['lang']) {
             // console.log('Lang: ' + document.documentElement.lang + ' Page: ' + customerSetLang['country_codes']['page']);
             const langLink = document.body.querySelector('li > a[hreflang="' + customerSetLang['country_codes']['page'] + '"]');
             if (typeof (langLink) != 'undefined' && langLink != null) {
@@ -296,16 +291,14 @@ class PopupSetLanguage {
         });
     }
 
-    init() {
-        // console.log('init');
-        // console.log('Test Local Storage: ' + localStorage.getItem('test-test'));
+    geoIP() {
 
         const lang_country_code = (typeof (document.documentElement.lang) === 'undefined' || document.documentElement.lang === null) ? '' : document.documentElement.lang;
         // console.log('Lang: ' + lang_country_code);
         // console.log('Location: ' + document.location);
 
         let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/geoip.php', document.location.origin);
-        url.searchParams.append('version', '2022121801');
+        url.searchParams.append('version', '2023041601');
         url.searchParams.append('lang_country_code', lang_country_code.toLowerCase());
         // console.log('URL: ' + url.href);
 
@@ -319,8 +312,8 @@ class PopupSetLanguage {
             } else if (("skip" in results) && results["skip"]) {
                 console.log('Skip popup...');
             } else {
-                // console.log('Check if is to show the popup...');
-                if (_this.checkIfIsToShow(results)) {
+                // console.log('if is to show the popup...');
+                if (_this.geoIpData['ip'] != results['ip']) {
                     if (localStorage.getItem(_this.localStorageKey) !== null) {
                         localStorage.removeItem(_this.localStorageKey);
                     }
@@ -329,20 +322,61 @@ class PopupSetLanguage {
                     // comment for debug
                     _this.modalElement.style.display = "block";
                 } else {
-                    _this.setCustomerLang();
+                    _this.storeCustomerDate(false);
                 }
             }
         });
+    }
 
-        this.manageStatus();
+    init() {
+        // console.log('init');
+        // console.log('Test Local Storage: ' + localStorage.getItem('test-test'));
+
+        this.geoIpData['ip'] = '';
+        if (localStorage.getItem(this.localStorageKey) !== null) {
+            const customerSetLang = JSON.parse(localStorage.getItem(this.localStorageKey));
+
+            if (!this.checkIfIsToShow(customerSetLang)) {
+                this.setCustomerLang(customerSetLang);
+                return;
+            }
+            if (('ip' in customerSetLang) && (customerSetLang['ip'] !== '')) {
+                this.geoIpData['max_hours'] = this.geoIpData['max_hours'];
+                this.geoIpData['ip'] = customerSetLang['ip'];
+                this.geoIpData['country_codes'] = {
+                    'ip': customerSetLang['country_codes']['ip'],
+                    'lang': customerSetLang['country_codes']['lang'],
+                    'page': customerSetLang['country_codes']['page']
+                }
+            }
+        }
+
+        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        let _this = this;
+        async function sleepyPopupSetLanguage() {
+            // console.log("I'm going to sleep for 5 second.");
+            await sleep(5000);
+            // console.log("I woke up after 5 second.");
+
+            _this.geoIP();
+
+            _this.manageStatus();
+        }
+
+        sleepyPopupSetLanguage();
+
     }
 
 }
 
-document.addEventListener("DOMContentLoaded", function(event) {
-    // console.log('URL: ' + window.location.pathname);
+document.addEventListener("DOMContentLoaded", function (event) {
+    // console.log('Hostname: ' + window.location.hostname + ' Pathname: ' + window.location.pathname);
+    console.log('Init PopupSetLanguage');
+
     let popSetLanguage = new PopupSetLanguage('modal-set-language');
     popSetLanguage.init();
 });
+
 
 /* ]]> */
