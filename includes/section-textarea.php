@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buttonAddExample.onclick = function(event) {
             // console.log('click button...');
             let url = new URL('wp-content/plugins/gurubeet-woocomm-setlang/example/popup-config.json', document.location.origin);
-            url.searchParams.append('version', '2022122201');
+            url.searchParams.append('version', '2023041601');
             // console.log('URL: ' + url.href);
             file_get_contents(url, event.currentTarget.parentNode.parentNode.children[1]);
         }
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buttonRecover.onclick = function(event) {
             // console.log('click button...');
             let url = new URL('wp-content/cache/gurubeet-woocomm-setlang/popup-config.json', document.location.origin);
-            url.searchParams.append('version', '2022122201');
+            url.searchParams.append('version', '2023041601');
             // console.log('URL: ' + url.href);
             file_get_contents(url, event.currentTarget.parentNode.parentNode.children[1]);
         }
